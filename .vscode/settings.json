@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
+{
+  "editor.formatOnSave": true,
+  "editor.rulers": [
+    80,
+    120
+  ],
+  "files.associations": {
+    ".gituser": "properties"
+  }
+}
