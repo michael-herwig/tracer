@@ -3,3 +3,8 @@
 
 # Local User Configuration
 .gituser
+CMakeUserPresets.json
+
+# Build Artifacts
+out/
+CMakeLists.txt.user
