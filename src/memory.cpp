@@ -3,6 +3,8 @@
 #define LOOP_OBJ
 #include "loop/memory.hpp"
 
+#include "loop/config.hpp"
+
 #include <cassert>
 
 #if defined(LOOP_OS_WINDOWS)

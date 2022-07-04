@@ -62,3 +62,14 @@ source_group("" FILES "${version_script}" "${version_cpp}")
 
 target_sources(loop PRIVATE $<BUILD_INTERFACE:${version_out}>)
 
+# >>> loop/config.hpp
+set(config_hpp "${loop_SOURCE_DIR}/config.hpp")
+set(config_out "${gen_hdr}/config.hpp")
+
+include(TestBigEndian)
+test_big_endian(LOOP_BIG_ENDIAN)
+
+configure_file("${config_hpp}" "${config_out}" @ONLY)
+
+source_group("" FILES "${config_hpp}")
+target_sources(loop PUBLIC $<BUILD_INTERFACE:${config_hpp}>)
