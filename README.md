@@ -1,4 +1,4 @@
-# loop [![License: MIT](https://img.shields.io/github/license/michael-herwig/loop?style=flat-square)](https://opensource.org/licenses/MIT)
+# loop [![License: MIT](https://img.shields.io/github/license/michael-herwig/loop?style=flat-square)](https://opensource.org/licenses/MIT) [![Codecov](https://codecov.io/gh/michael-herwig/loop/branch/main/graph/badge.svg?token=VMOAQRNIAQ)](https://codecov.io/gh/michael-herwig/loop)
 
 ### GIT
 
