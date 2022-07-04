@@ -93,5 +93,32 @@
       "inherits": "gha",
       "configurePreset": "gha-debug"
     }
+  ],
+  "testPresets": [
+    {
+      "name": "gha",
+      "hidden": true, 
+      "execution": {
+        "repeat": {
+          "mode": "until-fail",
+          "count": 3
+        },
+        "scheduleRandom": true,
+        "timeout": 10,
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "gha-release",
+      "displayName": "GitHub Actions (Release)",
+      "inherits": "gha",
+      "configurePreset": "gha-release"
+    },
+    {
+      "name": "gha-debug",
+      "displayName": "GitHub Actions (Debug)",
+      "inherits": "gha",
+      "configurePreset": "gha-debug"
+    }
   ]
 }

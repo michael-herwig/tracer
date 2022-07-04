@@ -27,3 +27,11 @@ jobs:
         run: |
           cmake --preset gha-release
           cmake --preset gha-debug
+      - name: Build
+        run: |
+          cmake --build --preset gha-release
+          cmake --build --preset gha-debug
+      - name: Test
+        run: |
+          ctest --preset gha-release
+          ctest --preset gha-debug
