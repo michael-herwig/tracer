@@ -22,4 +22,6 @@ jobs:
       - name: Install Python Packages
         run: pip install -r devenv/requirements.txt
       - name: Configure BuildSystem
-        run: cmake --preset default
+        run: |
+          cmake --preset default
+          cmake --preset default-debug

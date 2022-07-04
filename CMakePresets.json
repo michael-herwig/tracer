@@ -10,7 +10,7 @@
       "hidden": true,
       "binaryDir": "${sourceDir}/out/build-${presetName}",
       "installDir": "${sourceDir}/out/install-${presetName}",
-      "generator": "Ninja Multi-Config",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
         "LOOP_ENABLE_PEDANTIC": "ON",
         "LOOP_ENABLE_WERROR": "ON"
@@ -19,7 +19,18 @@
     {
       "name": "default",
       "displayName": "Default",
-      "inherits": "base"
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "default-debug",
+      "displayName": "Default (Debug)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ],
   "buildPresets": [
@@ -32,7 +43,7 @@
     {
       "name": "default-debug",
       "displayName": "Default (Debug)",
-      "configurePreset": "default",
+      "configurePreset": "default-debug",
       "configuration": "Debug"
     }
   ]
