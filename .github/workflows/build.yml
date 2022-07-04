@@ -74,14 +74,14 @@ jobs:
           ctest --preset gha-windows-debug
 
 
-  linux-coverage:
-    name: Linux Coverage
+  test-coverage:
+    name: Test Coverage
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: SetUp Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
           cache: "pip"
@@ -92,6 +92,7 @@ jobs:
         run: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends lcov
       - name: Configure BuildSystem
         env:
+          HUNTER_PYTHON_LOCATION: ${{ env.pythonLocation }}
           CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-gcc-x64.cmake"
           CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
         run: cmake --preset gha-coverage
@@ -106,6 +107,5 @@ jobs:
       - uses: codecov/codecov-action@v2
         name: Upload Test Coverage Report
         with:
-          flags: linux
           files: coverage.info
           fail_ci_if_error: true
