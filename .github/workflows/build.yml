@@ -2,7 +2,6 @@
 # SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
 name: Build, Test & Analyze
 on:
-  push:
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -40,3 +39,39 @@ jobs:
         run: |
           ctest --preset gha-release
           ctest --preset gha-debug
+
+  linux-coverage:
+    name: Linux Coverage
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Install LCOV
+        run: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends lcov
+      - name: Configure BuildSystem
+        env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-gcc-x64.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: cmake --preset gha-coverage
+      - name: Build
+        run: cmake --build --preset gha-coverage
+      - name: Test
+        run: ctest --preset gha-coverage
+      - name: Gather Test Coverage
+        run: |
+          lcov --directory out/build-gha-coverage --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' "${HOME}" --output-file coverage.info
+      - uses: codecov/codecov-action@v2
+        name: Upload Test Coverage Report
+        with:
+          flags: linux,${{ matrix.arch }}
+          files: coverage.info
+          fail_ci_if_error: true

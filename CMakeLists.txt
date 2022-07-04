@@ -30,6 +30,7 @@ project(loop HOMEPAGE_URL "https://github.com/michael-herwig/loop"
 # ---------------------------------------------------------------------------- #
 option(LOOP_ENABLE_PEDANTIC "enables pedantic warning settings" OFF)
 option(LOOP_ENABLE_WERROR "treats warnings as errors" OFF)
+option(LOOP_BUILD_COVERAGE "enables test coverage support" OFF)
 
 option(LOOP_SKIP_VERSION_UPDATE "skips update of embedded version info" OFF)
 
@@ -53,6 +54,26 @@ if(BUILD_TESTING)
 endif()
 option(LOOP_BUILD_TESTING "" ${testing_default})
 unset(testing_default)
+
+# ---------------------------------------------------------------------------- #
+# Dependencies                                                                 #
+# ---------------------------------------------------------------------------- #
+if(LOOP_BUILD_TESTING)
+  hunter_add_package(GTest)
+  find_package(GTest CONFIG REQUIRED)
+endif()
+
+# ---------------------------------------------------------------------------- #
+# Coverage Interface                                                           #
+# ---------------------------------------------------------------------------- #
+
+add_library(loop.coverage INTERFACE)
+add_library(loop::coverage ALIAS loop.coverage)
+
+target_compile_options(loop.coverage INTERFACE
+  $<$<CXX_COMPILER_ID:GNU,Clang>:-g -O0 --coverage -ftest-coverage -fprofile-arcs>)
+target_link_options(loop.coverage INTERFACE
+  $<$<CXX_COMPILER_ID:GNU,Clang>:-lgcov --coverage>)
 
 # ---------------------------------------------------------------------------- #
 # Library                                                                      #
@@ -91,6 +112,7 @@ target_compile_options(loop PRIVATE
 )
 
 set_target_properties(loop PROPERTIES C_EXTENSIONS ON CXX_EXTENSIONS OFF)
+target_link_libraries(loop PRIVATE $<$<BOOL:${LOOP_BUILD_COVERAGE}>:loop::coverage>)
 
 install(TARGETS loop)
 
@@ -133,9 +155,6 @@ target_sources(loop PRIVATE $<BUILD_INTERFACE:${config_hpp}>)
 # Testing                                                                      #
 # ---------------------------------------------------------------------------- #
 if(LOOP_BUILD_TESTING)
-  hunter_add_package(GTest)
-  find_package(GTest CONFIG REQUIRED)
-
   set(test_dir "${loop_SOURCE_DIR}/test")
   file(GLOB_RECURSE test_files "${test_dir}/**.hpp" "${test_dir}/**.cpp")
   source_group(TREE "${test_dir}" PREFIX "" FILES ${test_files})

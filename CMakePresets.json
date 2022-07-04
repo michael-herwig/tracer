@@ -58,6 +58,14 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
+    },
+    {
+      "name": "gha-coverage",
+      "displayName": "GitHub Actions (Coverage)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "LOOP_BUILD_COVERAGE": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -92,6 +100,11 @@
       "displayName": "GitHub Actions (Debug)",
       "inherits": "gha",
       "configurePreset": "gha-debug"
+    },
+    {
+      "name": "gha-coverage",
+      "displayName": "GitHub Actions (Coverage)",
+      "configurePreset": "gha-coverage"
     }
   ],
   "testPresets": [
@@ -119,6 +132,15 @@
       "displayName": "GitHub Actions (Debug)",
       "inherits": "gha",
       "configurePreset": "gha-debug"
+    },
+    {
+      "name": "gha-coverage",
+      "displayName": "GitHub Actions (Coverage)",
+      "configurePreset": "gha-coverage",
+      "execution": {
+        "timeout": 10,
+        "noTestsAction": "error"
+      }
     }
   ]
 }
