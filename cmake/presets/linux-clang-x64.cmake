@@ -11,4 +11,3 @@ tix_find_compiler(CMAKE_C_COMPILER clang)
 tix_find_compiler(CMAKE_CXX_COMPILER clang++)
 
 include(tix_arch_x64)
-include(tix_std_20)

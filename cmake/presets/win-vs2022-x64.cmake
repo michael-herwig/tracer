@@ -11,4 +11,3 @@ tix_init(
 )
 
 include(tix_arch_x64)
-include(tix_std_20)
