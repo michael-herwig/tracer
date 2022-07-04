@@ -17,6 +17,11 @@ using byte = std::byte;
 using byte = unsigned char;
 #endif
 
+inline constexpr byte operator""_byte(unsigned long long num)
+{
+  return static_cast<byte>(num);
+}
+
 LOOP_API void memzero(byte *data, std::size_t datalen);
 
 } // namespace loop

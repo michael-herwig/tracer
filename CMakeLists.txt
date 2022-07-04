@@ -40,10 +40,19 @@ if(BUILD_SHARED_LIBS)
 endif()
 option(LOOP_BUILD_SHARED "" ${shared_default})
 unset(shared_default)
+
 set(LOOP_LINKAGE STATIC)
 if(LOOP_BUILD_SHARED)
   set(LOOP_LINKAGE SHARED)
 endif()
+
+# >>> LOOP_BUILD_TESTING
+set(testing_default OFF)
+if(BUILD_TESTING)
+  set(testing_default ON)
+endif()
+option(LOOP_BUILD_TESTING "" ${testing_default})
+unset(testing_default)
 
 # ---------------------------------------------------------------------------- #
 # Library                                                                      #
@@ -51,7 +60,7 @@ endif()
 set(inc_dir "${loop_SOURCE_DIR}/inc")
 set(src_dir "${loop_SOURCE_DIR}/src")
 
-file(GLOB_RECURSE inc_files "${inc_dir}/**.hpp")
+file(GLOB_RECURSE inc_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${inc_dir}/**.hpp")
 file(GLOB_RECURSE int_files RELATIVE "${loop_SOURCE_DIR}" "${inc_dir}/**.hpp")
 file(GLOB_RECURSE src_files "${src_dir}/**.hpp" "${src_dir}/**.cpp")
 
@@ -61,8 +70,8 @@ source_group(TREE "${src_dir}" PREFIX "src" FILES ${src_files})
 add_library(loop ${LOOP_LINKAGE})
 add_library(loop::loop ALIAS loop)
 
-target_sources(loop PUBLIC $<INSTALL_INTERFACE:${int_files}> $<BUILD_INTERFACE:${inc_files}>
-  PRIVATE $<BUILD_INTERFACE:${src_files};${version_info_template}>)
+target_sources(loop PUBLIC $<INSTALL_INTERFACE:${int_files}> PRIVATE $<BUILD_INTERFACE:${int_files}>
+  $<BUILD_INTERFACE:${src_files}>)
 
 target_include_directories(loop PUBLIC $<INSTALL_INTERFACE:inc> $<BUILD_INTERFACE:${inc_dir}>
   PRIVATE $<BUILD_INTERFACE:${src_dir}>)
@@ -116,4 +125,27 @@ test_big_endian(LOOP_BIG_ENDIAN)
 configure_file("${config_hpp}" "${config_out}" @ONLY)
 
 source_group("" FILES "${config_hpp}")
-target_sources(loop PUBLIC $<BUILD_INTERFACE:${config_hpp}>)
+target_sources(loop PRIVATE $<BUILD_INTERFACE:${config_hpp}>)
+
+# ---------------------------------------------------------------------------- #
+# Testing                                                                      #
+# ---------------------------------------------------------------------------- #
+if(LOOP_BUILD_TESTING)
+  hunter_add_package(GTest)
+  find_package(GTest CONFIG REQUIRED)
+
+  set(test_dir "${loop_SOURCE_DIR}/test")
+  file(GLOB_RECURSE test_files "${test_dir}/**.hpp" "${test_dir}/**.cpp")
+  source_group(TREE "${test_dir}" PREFIX "" FILES ${test_files})
+
+  add_executable(loop.test)
+  add_executable(loop::test ALIAS loop.test)
+
+  target_sources(loop.test PRIVATE ${test_files})
+  target_include_directories(loop.test PRIVATE "${test_dir}")
+  target_link_libraries(loop.test PRIVATE loop GTest::gmock_main)
+
+  enable_testing()
+  add_test(NAME loop.test WORKING_DIRECTORY "${loop_BINARY_DIR}" COMMAND loop::test
+    "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/test-report-$<LOWER_CASE:$<CONFIG>>.xml")
+endif()
