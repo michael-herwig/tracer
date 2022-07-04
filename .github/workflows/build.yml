@@ -40,6 +40,38 @@ jobs:
           ctest --preset gha-release
           ctest --preset gha-debug
 
+  windows-build:
+    name: Windows Build
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        arch: [x32, x64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Configure BuildSystem
+        env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/win-vs2022-${{ matrix.arch }}.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: cmake --preset gha-windows
+      - name: Build
+        run: |
+          cmake --build --preset gha-windows-release
+          cmake --build --preset gha-windows-debug
+      - name: Test
+        run: |
+          ctest --preset gha-windows-release
+          ctest --preset gha-windows-debug
+
+
   linux-coverage:
     name: Linux Coverage
     runs-on: ubuntu-20.04
