@@ -92,6 +92,8 @@ target_compile_options(loop PRIVATE
 
 set_target_properties(loop PROPERTIES C_EXTENSIONS ON CXX_EXTENSIONS OFF)
 
+install(TARGETS loop)
+
 # ---------------------------------------------------------------------------- #
 # Generate                                                                     #
 # ---------------------------------------------------------------------------- #

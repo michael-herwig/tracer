@@ -10,6 +10,10 @@ jobs:
   linux-build:
     name: Linux Build
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        compiler: [gcc10, clang12]
+        arch: [x64]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,6 +27,7 @@ jobs:
         run: pip install -r devenv/requirements.txt
       - name: Configure BuildSystem
         env:
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-${{ matrix.compiler }}-${{ matrix.arch }}.cmake"
           CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
         run: |
           cmake --preset gha-release
