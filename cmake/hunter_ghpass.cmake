@@ -3,6 +3,6 @@
 hunter_upload_password(
     REPO "hunter-cache"
     REPO_OWNER "michael-herwig"
-    USERNAME "cpp-pm-ci"
+    USERNAME "ci-hunter"
     PASSWORD "$ENV{CI_HUNTER_TOKEN}"
 )

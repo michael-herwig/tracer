@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
+name: Build, Test & Analyze
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  linux-build:
+    name: Linux Build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Configure BuildSystem
+        run: cmake --preset default
