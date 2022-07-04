@@ -70,14 +70,6 @@
   ],
   "buildPresets": [
     {
-      "name": "gha",
-      "hidden": true,
-      "targets": [
-        "all",
-        "install"
-      ]
-    },
-    {
       "name": "default",
       "displayName": "Default (Release)",
       "configurePreset": "default",
@@ -92,13 +84,11 @@
     {
       "name": "gha-release",
       "displayName": "GitHub Actions (Release)",
-      "inherits": "gha",
       "configurePreset": "gha-release"
     },
     {
       "name": "gha-debug",
       "displayName": "GitHub Actions (Debug)",
-      "inherits": "gha",
       "configurePreset": "gha-debug"
     },
     {

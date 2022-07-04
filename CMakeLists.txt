@@ -114,8 +114,6 @@ target_compile_options(loop PRIVATE
 set_target_properties(loop PROPERTIES C_EXTENSIONS ON CXX_EXTENSIONS OFF)
 target_link_libraries(loop PRIVATE $<$<BOOL:${LOOP_BUILD_COVERAGE}>:loop::coverage>)
 
-install(TARGETS loop)
-
 # ---------------------------------------------------------------------------- #
 # Generate                                                                     #
 # ---------------------------------------------------------------------------- #
