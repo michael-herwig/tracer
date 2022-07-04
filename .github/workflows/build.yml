@@ -23,5 +23,5 @@ jobs:
         run: pip install -r devenv/requirements.txt
       - name: Configure BuildSystem
         run: |
-          cmake --preset default
-          cmake --preset default-debug
+          cmake --preset gha-release
+          cmake --preset gha-debug

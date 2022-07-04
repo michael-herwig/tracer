@@ -13,7 +13,18 @@
       "generator": "Unix Makefiles",
       "cacheVariables": {
         "LOOP_ENABLE_PEDANTIC": "ON",
-        "LOOP_ENABLE_WERROR": "ON"
+        "LOOP_ENABLE_WERROR": "ON",
+        "LOOP_BUILD_TESTING": "ON"
+      }
+    },
+    {
+      "name": "gha",
+      "hidden": true,
+      "cacheVariables": {
+        "HUNTER_PASSWORDS_PATH": "${sourceDir}/cmake/hunter_ghpass.cmake",
+        "HUNTER_CACHE_SERVERS": "https://github.com/michael-herwig/hunter-cache",
+        "HUNTER_USE_CACHE_SERVERS": "ON",
+        "HUNTER_RUN_UPLOAD": "ON"
       }
     },
     {
@@ -31,9 +42,33 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
+    },
+    {
+      "name": "gha-release",
+      "displayName": "GitHub Actions (Release)",
+      "inherits": ["base", "gha"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "gha-debug",
+      "displayName": "GitHub Actions (Debug)",
+      "inherits": ["base", "gha"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ],
   "buildPresets": [
+    {
+      "name": "gha",
+      "hidden": true,
+      "targets": [
+        "all",
+        "install"
+      ]
+    },
     {
       "name": "default",
       "displayName": "Default (Release)",
@@ -45,6 +80,18 @@
       "displayName": "Default (Debug)",
       "configurePreset": "default-debug",
       "configuration": "Debug"
+    },
+    {
+      "name": "gha-release",
+      "displayName": "GitHub Actions (Release)",
+      "inherits": "gha",
+      "configurePreset": "gha-release"
+    },
+    {
+      "name": "gha-debug",
+      "displayName": "GitHub Actions (Debug)",
+      "inherits": "gha",
+      "configurePreset": "gha-debug"
     }
   ]
 }
