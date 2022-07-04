@@ -5,6 +5,7 @@
 #define LOOP_CONFIG_HPP_INCLUDED
 
 // clang-format off
+#cmakedefine LOOP_BUILD_SHARED
 #cmakedefine LOOP_BIG_ENDIAN
 // clang-format on
 

@@ -15,6 +15,18 @@ project(loop HOMEPAGE_URL "https://github.com/michael-herwig/loop"
 # ---------------------------------------------------------------------------- #
 option(LOOP_SKIP_VERSION_UPDATE "skips update of embedded version info" OFF)
 
+# >>> LOOP_BUILD_SHARED, LOOP_LINKAGE
+set(shared_default OFF)
+if(BUILD_SHARED_LIBS)
+  set(shared_default ON)
+endif()
+option(LOOP_BUILD_SHARED "" ${shared_default})
+unset(shared_default)
+set(LOOP_LINKAGE STATIC)
+if(LOOP_BUILD_SHARED)
+  set(LOOP_LINKAGE SHARED)
+endif()
+
 # ---------------------------------------------------------------------------- #
 # Library                                                                      #
 # ---------------------------------------------------------------------------- #
@@ -28,7 +40,7 @@ file(GLOB_RECURSE src_files "${src_dir}/**.hpp" "${src_dir}/**.cpp")
 source_group(TREE "${inc_dir}" PREFIX "inc" FILES ${inc_files})
 source_group(TREE "${src_dir}" PREFIX "src" FILES ${src_files})
 
-add_library(loop)
+add_library(loop ${LOOP_LINKAGE})
 add_library(loop::loop ALIAS loop)
 
 target_sources(loop PUBLIC $<INSTALL_INTERFACE:${int_files}> $<BUILD_INTERFACE:${inc_files}>

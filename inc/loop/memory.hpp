@@ -6,6 +6,8 @@
 
 #include <cstddef>
 
+#include "loop/api.hpp"
+
 namespace loop
 {
 
@@ -15,7 +17,7 @@ using byte = std::byte;
 using byte = unsigned char;
 #endif
 
-void memzero(byte *data, std::size_t datalen);
+LOOP_API void memzero(byte *data, std::size_t datalen);
 
 } // namespace loop
 
