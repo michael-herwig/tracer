@@ -22,6 +22,8 @@ jobs:
       - name: Install Python Packages
         run: pip install -r devenv/requirements.txt
       - name: Configure BuildSystem
+        env:
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
         run: |
           cmake --preset gha-release
           cmake --preset gha-debug
