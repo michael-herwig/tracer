@@ -13,6 +13,9 @@ project(loop HOMEPAGE_URL "https://github.com/michael-herwig/loop"
 # ---------------------------------------------------------------------------- #
 # Options                                                                      #
 # ---------------------------------------------------------------------------- #
+option(LOOP_ENABLE_PEDANTIC "enables pedantic warning settings" OFF)
+option(LOOP_ENABLE_WERROR "treats warnings as errors" OFF)
+
 option(LOOP_SKIP_VERSION_UPDATE "skips update of embedded version info" OFF)
 
 # >>> LOOP_BUILD_SHARED, LOOP_LINKAGE
@@ -48,6 +51,20 @@ target_sources(loop PUBLIC $<INSTALL_INTERFACE:${int_files}> $<BUILD_INTERFACE:$
 
 target_include_directories(loop PUBLIC $<INSTALL_INTERFACE:inc> $<BUILD_INTERFACE:${inc_dir}>
   PRIVATE $<BUILD_INTERFACE:${src_dir}>)
+
+target_compile_options(loop PRIVATE
+  # GNU
+  "$<$<AND:$<BOOL:${LOOP_ENABLE_PEDANTIC}>,$<CXX_COMPILER_ID:GNU>>:-Wall;-Wextra;-Wpedantic>"
+  "$<$<AND:$<BOOL:${LOOP_ENABLE_WERROR}>,$<CXX_COMPILER_ID:GNU>>:-Werror>"
+
+  # CLANG
+  "$<$<AND:$<BOOL:${LOOP_ENABLE_PEDANTIC}>,$<CXX_COMPILER_ID:Clang>>:-Wall;-Wextra;-pedantic>"
+  "$<$<AND:$<BOOL:${LOOP_ENABLE_WERROR}>,$<CXX_COMPILER_ID:Clang>>:-Werror;-pedantic-errors>"
+
+  # MSVC
+  "$<$<AND:$<BOOL:${LOOP_ENABLE_PEDANTIC}>,$<CXX_COMPILER_ID:MSVC>>:/W3;/Wv:18>"
+  "$<$<AND:$<BOOL:${LOOP_ENABLE_WERROR}>,$<CXX_COMPILER_ID:MSVC>>:/WX>"
+)
 
 set_target_properties(loop PROPERTIES C_EXTENSIONS ON CXX_EXTENSIONS OFF)
 

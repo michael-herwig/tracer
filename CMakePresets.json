@@ -10,7 +10,11 @@
       "hidden": true,
       "binaryDir": "${sourceDir}/out/build-${presetName}",
       "installDir": "${sourceDir}/out/install-${presetName}",
-      "generator": "Ninja Multi-Config"
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": {
+        "LOOP_ENABLE_PEDANTIC": "ON",
+        "LOOP_ENABLE_WERROR": "ON"
+      }
     },
     {
       "name": "default",
