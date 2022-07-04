@@ -3,6 +3,21 @@
 cmake_minimum_required(VERSION 3.22)
 
 # ---------------------------------------------------------------------------- #
+# Hunter                                                                       #
+# ---------------------------------------------------------------------------- #
+# https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/hunter_gate.cmake")
+# https://github.com/cpp-pm/hunter/releases
+HunterGate(
+  URL "https://github.com/cpp-pm/hunter/archive/v0.24.3.tar.gz"
+  SHA1 "10738b59e539818a01090e64c2d09896247530c7"
+  FILEPATH "${CMAKE_CURRENT_LIST_DIR}/cmake/hunter_config.cmake"
+)
+
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/hunter_config.cmake")
+
+# ---------------------------------------------------------------------------- #
 # Project Definition                                                           #
 # ---------------------------------------------------------------------------- #
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/utility.cmake")
