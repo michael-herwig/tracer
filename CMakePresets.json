@@ -12,9 +12,9 @@
       "installDir": "${sourceDir}/out/install-${presetName}",
       "generator": "Unix Makefiles",
       "cacheVariables": {
-        "LOOP_ENABLE_PEDANTIC": "ON",
-        "LOOP_ENABLE_WERROR": "ON",
-        "LOOP_BUILD_TESTING": "ON"
+        "TRACER_ENABLE_PEDANTIC": "ON",
+        "TRACER_ENABLE_WERROR": "ON",
+        "TRACER_BUILD_TESTING": "ON"
       }
     },
     {
@@ -64,7 +64,7 @@
       "displayName": "GitHub Actions (Coverage)",
       "inherits": "gha-release",
       "cacheVariables": {
-        "LOOP_BUILD_COVERAGE": "ON"
+        "TRACER_BUILD_COVERAGE": "ON"
       }
     },
     {

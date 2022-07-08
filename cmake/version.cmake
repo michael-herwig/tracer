@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
 if(EXISTS "${OUTPUT_FILE}" AND ${SKIP})
-  message(STATUS "skipping version update (LOOP_SKIP_VERSION_UPDATE=ON)")
+  message(STATUS "skipping version update (TRACER_SKIP_VERSION_UPDATE=ON)")
   return()
 endif()
 

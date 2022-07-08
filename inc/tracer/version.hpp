@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
 #pragma once
-#ifndef LOOP_VERSION_INFO_HPP_INCLUDED
-#define LOOP_VERSION_INFO_HPP_INCLUDED
+#ifndef TRACER_VERSION_INFO_HPP_INCLUDED
+#define TRACER_VERSION_INFO_HPP_INCLUDED
 
-namespace loop
+namespace tracer
 {
 
 struct version_info
@@ -26,6 +26,6 @@ private:
   version_info() = delete;
 };
 
-} // namespace loop
+} // namespace tracer
 
-#endif // LOOP_VERSION_INFO_HPP_INCLUDED
+#endif // TRACER_VERSION_INFO_HPP_INCLUDED

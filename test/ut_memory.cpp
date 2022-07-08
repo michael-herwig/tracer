@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
-#include "loop/memory.hpp"
+#include "tracer/memory.hpp"
 
 #include <gmock/gmock.h>
 
 using namespace ::testing;
-using namespace ::loop;
+using namespace ::tracer;
 
 TEST(memzero, nomem)
 {

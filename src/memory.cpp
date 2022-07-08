@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
-#define LOOP_OBJ
-#include "loop/memory.hpp"
+#define TRACER_OBJ
+#include "tracer/memory.hpp"
 
-#include "loop/config.hpp"
+#include "tracer/config.hpp"
 
 #include <cassert>
 
-#if defined(LOOP_OS_WINDOWS)
+#if defined(TRACER_OS_WINDOWS)
 #include <Windows.h>
 #endif
 
-namespace loop
+namespace tracer
 {
 
 void memzero(byte *data, std::size_t datalen)
 {
   assert(nullptr != data || 0 == datalen);
 
-#if defined(LOOP_OS_WINDOWS)
+#if defined(TRACER_OS_WINDOWS)
   SecureZeroMemory(memadr, memlen);
 #else
   size_t i;
@@ -30,4 +30,4 @@ void memzero(byte *data, std::size_t datalen)
 #endif
 }
 
-} // namespace loop
+} // namespace tracer

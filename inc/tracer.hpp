@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
 #pragma once
-#ifndef LOOP_HPP_INCLUDED
-#define LOOP_HPP_INCLUDED
+#ifndef TRACER_HPP_INCLUDED
+#define TRACER_HPP_INCLUDED
 
-#include "loop/memory.hpp"
+#include "tracer/memory.hpp"
 
-#endif // LOOP_HPP_INCLUDED
+#endif // TRACER_HPP_INCLUDED
