@@ -76,6 +76,15 @@ endif()
 option(TRACER_ENABLE_CLANGTIDY "enables the clang-tidy target" ${_clangtidy_default})
 unset(_clangtidy_default)
 
+# >>> TRACER_ENABLE_CLANGFORMAT
+set(_clangformat_default OFF)
+find_package(clang-tools COMPONENTS format QUIET)
+if(clang-format_FOUND)
+  set(_clangformat_default ON)
+endif()
+option(TRACER_ENABLE_CLANGFORMAT "enables the clang-format target" ${_clangformat_default})
+unset(_clangformat_default)
+
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Dependencies                                                                                                         #
@@ -249,4 +258,21 @@ if(TRACER_ENABLE_CLANGTIDY)
     COMMAND ${Python_EXECUTABLE} "${clang_tidy_script}" -clang-tidy-binary="${clang-tidy_EXECUTABLE}"
       -p="${tracer_BINARY_DIR}" -quiet
     SOURCES "${clang_tidy_cfg}" WORKING_DIRECTORY ${tracer_SOURCE_DIR})
+endif()
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# clang-format                                                                                                         #
+# -------------------------------------------------------------------------------------------------------------------- #
+if(TRACER_ENABLE_CLANGFORMAT)
+  find_package(clang-tools REQUIRED COMPONENTS format)
+  set(clang_format_cfg "${tracer_SOURCE_DIR}/.clang-format")
+  set(clang_format_files ${inc_files} ${src_files} "${version_cpp}" "${config_hpp}")
+
+  add_custom_target(tracer-clangformat
+    COMMAND ${clang-format_EXECUTABLE} --dry-run --Werror --style=file ${clang_format_files}
+    SOURCES "${clang_format_cfg}" WORKING_DIRECTORY ${tracer_SOURCE_DIR})
+
+  add_custom_target(tracer-clangformat-fix
+    COMMAND ${clang-format_EXECUTABLE} -i --style=file ${clang_format_files}
+    SOURCES "${clang_format_cfg}" WORKING_DIRECTORY ${tracer_SOURCE_DIR})
 endif()
