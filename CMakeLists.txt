@@ -32,8 +32,8 @@ project(tracer HOMEPAGE_URL "https://github.com/michael-herwig/tracer"
 # -------------------------------------------------------------------------------------------------------------------- #
 option(TRACER_ENABLE_PEDANTIC "enables pedantic warning settings" OFF)
 option(TRACER_ENABLE_WERROR "treats warnings as errors" OFF)
+option(TRACER_DISABLE_CCACHE "disables auto detection of ccache to speed compilation" OFF)
 option(TRACER_BUILD_COVERAGE "enables test coverage support" OFF)
-
 option(TRACER_SKIP_VERSION_UPDATE "skips update of embedded version info" OFF)
 
 # >>> TRACER_BUILD_SHARED, TRACER_LINKAGE
@@ -83,6 +83,10 @@ unset(_clangtidy_default)
 if(TRACER_BUILD_TESTING)
   hunter_add_package(GTest)
   find_package(GTest CONFIG REQUIRED)
+endif()
+
+if(NOT TRACER_DISABLE_CCACHE)
+  find_package(ccache QUIET)
 endif()
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -138,6 +142,11 @@ target_compile_options(tracer PRIVATE
 set_target_properties(tracer PROPERTIES C_EXTENSIONS ON CXX_EXTENSIONS OFF)
 target_link_libraries(tracer PRIVATE $<$<BOOL:${TRACER_BUILD_COVERAGE}>:tracer::coverage>)
 
+if(NOT TRACER_DISABLE_CCACHE AND ccache_FOUND)
+  set_target_properties(tracer PROPERTIES C_COMPILER_LAUNCHER "${ccache_EXECUTABLE}"
+    CXX_COMPILER_LAUNCHER "${ccache_EXECUTABLE}")
+endif()
+
 # -------------------------------------------------------------------------------------------------------------------- #
 # Generate                                                                                                             #
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -188,6 +197,9 @@ if(TRACER_BUILD_TESTING)
   target_sources(tracer-test PRIVATE ${test_files})
   target_include_directories(tracer-test PRIVATE "${test_dir}")
   target_link_libraries(tracer-test PRIVATE tracer GTest::gmock_main)
+
+  set_target_properties(tracer-test PROPERTIES C_COMPILER_LAUNCHER "${ccache_EXECUTABLE}"
+    CXX_COMPILER_LAUNCHER "${ccache_EXECUTABLE}")
 
   enable_testing()
   add_test(NAME tracer-test WORKING_DIRECTORY "${tracer_BINARY_DIR}" COMMAND tracer::test
