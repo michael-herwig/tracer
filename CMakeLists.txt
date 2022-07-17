@@ -195,11 +195,11 @@ target_sources(tracer PRIVATE $<BUILD_INTERFACE:${config_hpp}>)
 # -------------------------------------------------------------------------------------------------------------------- #
 # Testing                                                                                                              #
 # -------------------------------------------------------------------------------------------------------------------- #
-if(TRACER_BUILD_TESTING)
-  set(test_dir "${tracer_SOURCE_DIR}/test")
-  file(GLOB_RECURSE test_files "${test_dir}/**.hpp" "${test_dir}/**.cpp")
-  source_group(TREE "${test_dir}" PREFIX "" FILES ${test_files})
+set(test_dir "${tracer_SOURCE_DIR}/test")
+file(GLOB_RECURSE test_files "${test_dir}/**.hpp" "${test_dir}/**.cpp")
+source_group(TREE "${test_dir}" PREFIX "" FILES ${test_files})
 
+if(TRACER_BUILD_TESTING)
   add_executable(tracer-test)
   add_executable(tracer::test ALIAS tracer-test)
 
@@ -266,7 +266,7 @@ endif()
 if(TRACER_ENABLE_CLANGFORMAT)
   find_package(clang-tools REQUIRED COMPONENTS format)
   set(clang_format_cfg "${tracer_SOURCE_DIR}/.clang-format")
-  set(clang_format_files ${inc_files} ${src_files} "${version_cpp}" "${config_hpp}")
+  set(clang_format_files ${inc_files} ${src_files} ${test_files} "${version_cpp}" "${config_hpp}")
 
   add_custom_target(tracer-clangformat
     COMMAND ${clang-format_EXECUTABLE} --dry-run --Werror --style=file ${clang_format_files}
