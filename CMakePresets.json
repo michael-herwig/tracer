@@ -79,6 +79,22 @@
       "cacheVariables": {
         "TRACER_ENABLE_CPPCHECK": "ON"
       }
+    },
+    {
+      "name": "gha-clangformat",
+      "displayName": "GitHub Actions (ClangFormat)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_ENABLE_CLANGFORMAT": "ON"
+      }
+    },
+    {
+      "name": "gha-clangtidy",
+      "displayName": "GitHub Actions (ClangTidy)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_ENABLE_CLANGTIDY": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -120,6 +136,18 @@
       "name": "gha-coverage",
       "displayName": "GitHub Actions (Coverage)",
       "configurePreset": "gha-coverage"
+    },
+    {
+      "name": "gha-clangformat",
+      "displayName": "GitHub Actions (ClangFormat)",
+      "configurePreset": "gha-clangformat",
+      "targets": "tracer-clangformat"
+    },
+    {
+      "name": "gha-clangtidy",
+      "displayName": "GitHub Actions (ClangTidy)",
+      "configurePreset": "gha-clangtidy",
+      "targets": "tracer-clangtidy"
     }
   ],
   "testPresets": [
