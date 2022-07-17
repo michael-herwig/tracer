@@ -216,45 +216,21 @@ if(TRACER_ENABLE_CPPCHECK)
   set(cppcheck_config "${tracer_SOURCE_DIR}/.cppcheck")
   set(cppcheck_bindir "${tracer_BINARY_DIR}/cppcheck")
 
-  add_custom_target(
-    tracer-cppcheck
-
+  add_custom_target(tracer-cppcheck
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${cppcheck_bindir}/plist" "${cppcheck_bindir}/build"
-    COMMAND "${cppcheck_EXECUTABLE}"
-      --project=compile_commands.json
-      --suppress=missingInclude
-      --inconclusive
-      --enable=all
-      --inline-suppr
-      --template=gcc
-      --max-ctu-depth=8
-      --quiet
-      --language=c++
-
-      # TODO(michael-herwig) --std=
-      # TODO(michael-herwig) --platform=
-
-      --relative-paths="${tracer_SOURCE_DIR};${gen_dir}"
-      --file-filter="${tracer_SOURCE_DIR}/inc/*"
-      --file-filter="${tracer_SOURCE_DIR}/src/*"
-      --file-filter="${tracer_SOURCE_DIR}/test/*"
-      --suppressions-list="${cppcheck_config}"
-      --plist-output="${cppcheck_bindir}/plist"
-      --cppcheck-build-dir="${cppcheck_bindir}/build"
-      -DCPPCHECK
-
+    COMMAND "${cppcheck_EXECUTABLE}" --project=compile_commands.json --suppress=missingInclude --inconclusive
+      --enable=all --inline-suppr --template=gcc --max-ctu-depth=8 --quiet --language=c++
+      --relative-paths="${tracer_SOURCE_DIR};${gen_dir}" --file-filter="${tracer_SOURCE_DIR}/inc/*"
+      --file-filter="${tracer_SOURCE_DIR}/src/*" --file-filter="${tracer_SOURCE_DIR}/test/*"
+      --suppressions-list="${cppcheck_config}" --plist-output="${cppcheck_bindir}/plist"
+      --cppcheck-build-dir="${cppcheck_bindir}/build" -DCPPCHECK
       $<$<BOOL:${TRACER_ENABLE_WERROR}>:--error-exitcode=255>
       $<$<BOOL:$<TARGET_PROPERTY:tracer,CXX_STANDARD>>:--std=c++$<TARGET_PROPERTY:tracer,CXX_STANDARD>>
       $<$<NOT:$<CONFIG:DEBUG>>:-DNDEBUG>
 
-    SOURCES
-      "${cppcheck_config}"
-
-    DEPENDS
-      "${version_target}"
-
-    WORKING_DIRECTORY
-      "${tracer_BINARY_DIR}"
+      # TODO(michael-herwig) --std=
+      # TODO(michael-herwig) --platform=
+    SOURCES "${cppcheck_config}" DEPENDS "${version_target}" WORKING_DIRECTORY "${tracer_BINARY_DIR}"
   )
 endif()
 
@@ -269,18 +245,8 @@ if(TRACER_ENABLE_CLANGTIDY)
   set(clang_tidy_cfg "${tracer_SOURCE_DIR}/.clang-tidy")
   set(clang_tidy_script "${tracer_SOURCE_DIR}/cmake/clang-tidy.py")
 
-  add_custom_target(
-    tracer-clangtidy
-
-    COMMAND ${Python_EXECUTABLE} "${clang_tidy_script}"
-      -clang-tidy-binary="${clang-tidy_EXECUTABLE}"
+  add_custom_target(tracer-clangtidy
+    COMMAND ${Python_EXECUTABLE} "${clang_tidy_script}" -clang-tidy-binary="${clang-tidy_EXECUTABLE}"
       -p="${tracer_BINARY_DIR}" -quiet
-      $<$<BOOL:${TRACER_ENABLE_WERROR}>:--warnings-as-errors=*>
-
-    SOURCES
-      "${clang_tidy_cfg}"
-
-    WORKING_DIRECTORY
-      ${tracer_SOURCE_DIR}
-  )
+    SOURCES "${clang_tidy_cfg}" WORKING_DIRECTORY ${tracer_SOURCE_DIR})
 endif()
