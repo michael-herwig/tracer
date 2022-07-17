@@ -1,0 +1,157 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
+name: Build, Test & Analyze
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  linux-build:
+    name: Linux Build
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        compiler: [gcc10, clang12]
+        arch: [x64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Configure BuildSystem
+        env:
+          HUNTER_PYTHON_LOCATION: ${{ env.pythonLocation }}
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-${{ matrix.compiler }}-${{ matrix.arch }}.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: |
+          cmake --preset gha-release
+          cmake --preset gha-debug
+      - name: Build
+        run: |
+          cmake --build --preset gha-release
+          cmake --build --preset gha-debug
+      - name: Test
+        run: |
+          ctest --preset gha-release
+          ctest --preset gha-debug
+
+  windows-build:
+    name: Windows Build
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        arch: [x32, x64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Configure BuildSystem
+        env:
+          HUNTER_PYTHON_LOCATION: ${{ env.pythonLocation }}
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/win-vs2022-${{ matrix.arch }}.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: cmake --preset gha-windows
+      - name: Build
+        run: |
+          cmake --build --preset gha-windows-release
+          cmake --build --preset gha-windows-debug
+      - name: Test
+        run: |
+          ctest --preset gha-windows-release
+          ctest --preset gha-windows-debug
+
+
+  test-coverage:
+    name: Test Coverage
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Install LCOV
+        run: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends lcov
+      - name: Configure BuildSystem
+        env:
+          HUNTER_PYTHON_LOCATION: ${{ env.pythonLocation }}
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-gcc-x64.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: cmake --preset gha-coverage
+      - name: Build
+        run: cmake --build --preset gha-coverage
+      - name: Test
+        run: ctest --preset gha-coverage
+      - name: Gather Test Coverage
+        run: |
+          lcov --directory out/build-gha-coverage --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' "${HOME}" --output-file coverage.info
+      - uses: codecov/codecov-action@v2
+        name: Upload Test Coverage Report
+        with:
+          files: coverage.info
+          fail_ci_if_error: true
+
+  test-clangformat:
+    name: Check ClangFormat
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Configure BuildSystem
+        env:
+          HUNTER_PYTHON_LOCATION: ${{ env.pythonLocation }}
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-gcc-x64.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: cmake --preset gha-clangformat
+      - name: Build
+        run: cmake --build --preset gha-clangformat
+
+  test-clangtidy:
+    name: Check ClangTidy
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: SetUp Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "devenv/requirements.txt"
+      - name: Install Python Packages
+        run: pip install -r devenv/requirements.txt
+      - name: Configure BuildSystem
+        env:
+          HUNTER_PYTHON_LOCATION: ${{ env.pythonLocation }}
+          CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/cmake/presets/linux-gcc-x64.cmake"
+          CI_HUNTER_TOKEN: ${{ secrets.CI_HUNTER_TOKEN }}
+        run: cmake --preset gha-clangtidy
+      - name: Build
+        run: cmake --build --preset gha-clangtidy

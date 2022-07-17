@@ -1,0 +1,203 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build-${presetName}",
+      "installDir": "${sourceDir}/out/install-${presetName}",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "TRACER_ENABLE_PEDANTIC": "ON",
+        "TRACER_ENABLE_WERROR": "ON",
+        "TRACER_BUILD_TESTING": "ON"
+      }
+    },
+    {
+      "name": "default",
+      "displayName": "Default",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "default-debug",
+      "displayName": "Default (Debug)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "gha",
+      "hidden": true,
+      "cacheVariables": {
+        "HUNTER_PASSWORDS_PATH": "${sourceDir}/cmake/hunter_ghpass.cmake",
+        "HUNTER_CACHE_SERVERS": "https://github.com/michael-herwig/hunter-cache",
+        "HUNTER_USE_CACHE_SERVERS": "ON",
+        "HUNTER_RUN_UPLOAD": "ON"
+      }
+    },
+    {
+      "name": "gha-release",
+      "displayName": "GitHub Actions (Release)",
+      "inherits": ["base", "gha"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "gha-debug",
+      "displayName": "GitHub Actions (Debug)",
+      "inherits": ["base", "gha"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "gha-windows",
+      "inherits": ["base", "gha"],
+      "generator": "Visual Studio 17 2022"
+    },
+    {
+      "name": "gha-coverage",
+      "displayName": "GitHub Actions (Coverage)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_BUILD_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "gha-cppcheck",
+      "displayName": "GitHub Actions (CppCheck)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_ENABLE_CPPCHECK": "ON"
+      }
+    },
+    {
+      "name": "gha-clangformat",
+      "displayName": "GitHub Actions (ClangFormat)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_ENABLE_CLANGFORMAT": "ON"
+      }
+    },
+    {
+      "name": "gha-clangtidy",
+      "displayName": "GitHub Actions (ClangTidy)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_ENABLE_CLANGTIDY": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "displayName": "Default (Release)",
+      "configurePreset": "default",
+      "configuration": "Release"
+    },
+    {
+      "name": "default-debug",
+      "displayName": "Default (Debug)",
+      "configurePreset": "default-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "gha-release",
+      "displayName": "GitHub Actions (Release)",
+      "configurePreset": "gha-release"
+    },
+    {
+      "name": "gha-debug",
+      "displayName": "GitHub Actions (Debug)",
+      "configurePreset": "gha-debug"
+    },
+    {
+      "name": "gha-windows-release",
+      "displayName": "GitHub Actions (Windows Release)",
+      "configurePreset": "gha-windows",
+      "configuration": "Release"
+    },
+    {
+      "name": "gha-windows-debug",
+      "displayName": "GitHub Actions (Windows Debug)",
+      "configurePreset": "gha-windows",
+      "configuration": "Debug"
+    },
+    {
+      "name": "gha-coverage",
+      "displayName": "GitHub Actions (Coverage)",
+      "configurePreset": "gha-coverage"
+    },
+    {
+      "name": "gha-clangformat",
+      "displayName": "GitHub Actions (ClangFormat)",
+      "configurePreset": "gha-clangformat",
+      "targets": "tracer-clangformat"
+    },
+    {
+      "name": "gha-clangtidy",
+      "displayName": "GitHub Actions (ClangTidy)",
+      "configurePreset": "gha-clangtidy",
+      "targets": "tracer-clangtidy"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "gha",
+      "hidden": true, 
+      "execution": {
+        "repeat": {
+          "mode": "until-fail",
+          "count": 3
+        },
+        "scheduleRandom": true,
+        "timeout": 10,
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "gha-release",
+      "displayName": "GitHub Actions (Release)",
+      "inherits": "gha",
+      "configurePreset": "gha-release"
+    },
+    {
+      "name": "gha-debug",
+      "displayName": "GitHub Actions (Debug)",
+      "inherits": "gha",
+      "configurePreset": "gha-debug"
+    },
+    {
+      "name": "gha-windows-release",
+      "displayName": "GitHub Actions (Windows Release)",
+      "inherits": "gha",
+      "configurePreset": "gha-windows",
+      "configuration": "Release"
+    },
+    {
+      "name": "gha-windows-debug",
+      "displayName": "GitHub Actions (Windows Debug)",
+      "inherits": "gha",
+      "configurePreset": "gha-windows",
+      "configuration": "Debug"
+    },
+    {
+      "name": "gha-coverage",
+      "displayName": "GitHub Actions (Coverage)",
+      "configurePreset": "gha-coverage",
+      "execution": {
+        "timeout": 10,
+        "noTestsAction": "error"
+      }
+    }
+  ]
+}

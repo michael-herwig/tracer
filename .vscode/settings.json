@@ -1,12 +1,18 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
 {
-  "editor.formatOnSave": true,
+  "files.watcherExclude": {
+    "out/**": true
+  },
+  "editor.formatOnSave": false,
   "editor.rulers": [
     80,
     120
   ],
   "files.associations": {
     ".gituser": "properties"
+  },
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": "**/.github/workflows/*.yml"
   }
 }
