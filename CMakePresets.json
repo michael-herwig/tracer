@@ -60,6 +60,11 @@
       }
     },
     {
+      "name": "gha-windows",
+      "inherits": ["base", "gha"],
+      "generator": "Visual Studio 17 2022"
+    },
+    {
       "name": "gha-coverage",
       "displayName": "GitHub Actions (Coverage)",
       "inherits": "gha-release",
@@ -68,9 +73,12 @@
       }
     },
     {
-      "name": "gha-windows",
-      "inherits": ["base", "gha"],
-      "generator": "Visual Studio 17 2022"
+      "name": "gha-cppcheck",
+      "displayName": "GitHub Actions (CppCheck)",
+      "inherits": "gha-release",
+      "cacheVariables": {
+        "TRACER_ENABLE_CPPCHECK": "ON"
+      }
     }
   ],
   "buildPresets": [

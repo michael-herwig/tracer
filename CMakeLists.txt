@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
 cmake_minimum_required(VERSION 3.22)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Hunter                                                                                                               #
@@ -22,6 +23,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 # -------------------------------------------------------------------------------------------------------------------- #
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/utility.cmake")
 parse_version(tracer_VERSION FILEPATH "${CMAKE_CURRENT_LIST_DIR}/VERSION")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(tracer HOMEPAGE_URL "https://github.com/michael-herwig/tracer"
   VERSION "${tracer_VERSION}")
 
@@ -54,6 +56,16 @@ if(BUILD_TESTING)
 endif()
 option(TRACER_BUILD_TESTING "" ${testing_default})
 unset(testing_default)
+
+# >>> TRACER_ENABLE_CPPCHECK
+set(_cppcheck_default OFF)
+find_package(cppcheck QUIET)
+if(cppcheck_FOUND AND CMAKE_EXPORT_COMPILE_COMMANDS)
+  set(_cppcheck_default ON)
+endif()
+option(TRACER_ENABLE_CPPCHECK "enables the cppcheck target" ${_cppcheck_default})
+unset(_cppcheck_default)
+
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Dependencies                                                                                                         #
@@ -97,6 +109,8 @@ target_sources(tracer PUBLIC $<INSTALL_INTERFACE:${int_files}> PRIVATE $<BUILD_I
 target_include_directories(tracer PUBLIC $<INSTALL_INTERFACE:inc> $<BUILD_INTERFACE:${inc_dir}>
   PRIVATE $<BUILD_INTERFACE:${src_dir}>)
 
+target_compile_definitions(tracer PUBLIC $<$<NOT:$<CONFIG:DEBUG>>:NDEBUG>)
+
 target_compile_options(tracer PRIVATE
   # GNU
   "$<$<AND:$<BOOL:${TRACER_ENABLE_PEDANTIC}>,$<CXX_COMPILER_ID:GNU>>:-Wall;-Wextra;-Wpedantic>"
@@ -128,7 +142,8 @@ target_include_directories(tracer PUBLIC $<BUILD_INTERFACE:${gen_inc}>)
 set(version_script "${tracer_SOURCE_DIR}/cmake/version.cmake")
 set(version_cpp "${tracer_SOURCE_DIR}/cmake/version.cpp")
 set(version_out "${gen_src}/version$<$<CONFIG:DEBUG>:d>.cpp")
-add_custom_target(gen-version BYPRODUCTS "${version_out}" SOURCES "${version_script}" "${version_cpp}"
+set(version_target "tracer-version")
+add_custom_target("${version_target}" BYPRODUCTS "${version_out}" SOURCES "${version_script}" "${version_cpp}"
   COMMAND "${CMAKE_COMMAND}" -DPROJECT_VERSION="${tracer_VERSION}" -DSKIP="${TRACER_SKIP_VERSION_UPDATE}"
     -DINPUT_FILE="${version_cpp}" -DOUTPUT_FILE="${version_out}" -P "${version_script}"
   WORKING_DIRECTORY "${tracer_SOURCE_DIR}")
@@ -157,14 +172,71 @@ if(TRACER_BUILD_TESTING)
   file(GLOB_RECURSE test_files "${test_dir}/**.hpp" "${test_dir}/**.cpp")
   source_group(TREE "${test_dir}" PREFIX "" FILES ${test_files})
 
-  add_executable(tracer.test)
-  add_executable(tracer::test ALIAS tracer.test)
+  add_executable(tracer-test)
+  add_executable(tracer::test ALIAS tracer-test)
 
-  target_sources(tracer.test PRIVATE ${test_files})
-  target_include_directories(tracer.test PRIVATE "${test_dir}")
-  target_link_libraries(tracer.test PRIVATE tracer GTest::gmock_main)
+  target_sources(tracer-test PRIVATE ${test_files})
+  target_include_directories(tracer-test PRIVATE "${test_dir}")
+  target_link_libraries(tracer-test PRIVATE tracer GTest::gmock_main)
 
   enable_testing()
   add_test(NAME tracer.test WORKING_DIRECTORY "${tracer_BINARY_DIR}" COMMAND tracer::test
     "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/test-report-$<LOWER_CASE:$<CONFIG>>.xml")
+endif()
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# Cppcheck                                                                                                             #
+# -------------------------------------------------------------------------------------------------------------------- #
+if(TRACER_ENABLE_CPPCHECK)
+  find_package(cppcheck REQUIRED)
+  if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+    message(FATAL_ERROR "cppcheck requires compile_commands.json which requires CMAKE_EXPORT_COMPILE_COMMANDS=ON.")
+  endif()
+  if(NOT CMAKE_GENERATOR STREQUAL "Unix Makefiles" AND NOT CMAKE_GENERATOR STREQUAL "Ninja")
+    message(FATAL_ERROR "cppcheck requires compile_commands.json which requires 'Unix Makefiles' or 'Ninja' generator.")
+  endif()
+
+  set(cppcheck_config "${tracer_SOURCE_DIR}/.cppcheck")
+  set(cppcheck_bindir "${tracer_BINARY_DIR}/cppcheck")
+
+  add_custom_target(
+    tracer-cppcheck
+
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${cppcheck_bindir}/plist" "${cppcheck_bindir}/build"
+    COMMAND "${cppcheck_EXECUTABLE}"
+      --project=compile_commands.json
+      --suppress=missingInclude
+      --inconclusive
+      --enable=all
+      --inline-suppr
+      --template=gcc
+      --max-ctu-depth=8
+      --quiet
+      --language=c++
+
+      # TODO(michael-herwig) --std=
+      # TODO(michael-herwig) --platform=
+
+      --relative-paths="${tracer_SOURCE_DIR};${gen_dir}"
+      --file-filter="${tracer_SOURCE_DIR}/inc/*"
+      --file-filter="${tracer_SOURCE_DIR}/src/*"
+      --file-filter="${tracer_SOURCE_DIR}/test/*"
+      --suppressions-list="${cppcheck_config}"
+      --plist-output="${cppcheck_bindir}/plist"
+      --cppcheck-build-dir="${cppcheck_bindir}/build"
+      -DCPPCHECK
+
+      $<$<BOOL:${TRACER_ENABLE_WERROR}>:--error-exitcode=255>
+      $<$<BOOL:$<TARGET_PROPERTY:tracer,CXX_STANDARD>>:--std=c++$<TARGET_PROPERTY:tracer,CXX_STANDARD>>
+      $<$<NOT:$<CONFIG:DEBUG>>:-DNDEBUG>
+
+    SOURCES
+      "${cppcheck_config}"
+
+    DEPENDS
+      "${version_target}"
+
+    WORKING_DIRECTORY
+      "${tracer_BINARY_DIR}"
+  )
 endif()
