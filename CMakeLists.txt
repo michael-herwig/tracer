@@ -79,12 +79,12 @@ endif()
 # Coverage Interface                                                                                                   #
 # -------------------------------------------------------------------------------------------------------------------- #
 
-add_library(tracer.coverage INTERFACE)
-add_library(tracer::coverage ALIAS tracer.coverage)
+add_library(tracer-coverage INTERFACE)
+add_library(tracer::coverage ALIAS tracer-coverage)
 
-target_compile_options(tracer.coverage INTERFACE
+target_compile_options(tracer-coverage INTERFACE
   $<$<CXX_COMPILER_ID:GNU,Clang>:-g -O0 --coverage -ftest-coverage -fprofile-arcs>)
-target_link_options(tracer.coverage INTERFACE
+target_link_options(tracer-coverage INTERFACE
   $<$<CXX_COMPILER_ID:GNU,Clang>:-lgcov --coverage>)
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -180,7 +180,7 @@ if(TRACER_BUILD_TESTING)
   target_link_libraries(tracer-test PRIVATE tracer GTest::gmock_main)
 
   enable_testing()
-  add_test(NAME tracer.test WORKING_DIRECTORY "${tracer_BINARY_DIR}" COMMAND tracer::test
+  add_test(NAME tracer-test WORKING_DIRECTORY "${tracer_BINARY_DIR}" COMMAND tracer::test
     "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/test-report-$<LOWER_CASE:$<CONFIG>>.xml")
 endif()
 
