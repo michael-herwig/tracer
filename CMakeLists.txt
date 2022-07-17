@@ -257,7 +257,7 @@ if(TRACER_ENABLE_CLANGTIDY)
   add_custom_target(tracer-clangtidy
     COMMAND ${Python_EXECUTABLE} "${clang_tidy_script}" -clang-tidy-binary="${clang-tidy_EXECUTABLE}"
       -p="${tracer_BINARY_DIR}" -quiet
-    SOURCES "${clang_tidy_cfg}" WORKING_DIRECTORY ${tracer_SOURCE_DIR})
+    SOURCES "${clang_tidy_cfg}" WORKING_DIRECTORY ${tracer_SOURCE_DIR} DEPENDS "${version_target}")
 endif()
 
 # -------------------------------------------------------------------------------------------------------------------- #
