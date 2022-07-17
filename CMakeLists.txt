@@ -60,7 +60,7 @@ unset(testing_default)
 # >>> TRACER_ENABLE_CPPCHECK
 set(_cppcheck_default OFF)
 find_package(cppcheck QUIET)
-if(cppcheck_FOUND AND CMAKE_EXPORT_COMPILE_COMMANDS)
+if(CMAKE_GENERATOR STREQUAL "Unix Makefiles" OR CMAKE_GENERATOR STREQUAL "Ninja" AND cppcheck_FOUND AND CMAKE_EXPORT_COMPILE_COMMANDS)
   set(_cppcheck_default ON)
 endif()
 option(TRACER_ENABLE_CPPCHECK "enables the cppcheck target" ${_cppcheck_default})
