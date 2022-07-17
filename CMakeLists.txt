@@ -207,8 +207,10 @@ if(TRACER_BUILD_TESTING)
   target_include_directories(tracer-test PRIVATE "${test_dir}")
   target_link_libraries(tracer-test PRIVATE tracer GTest::gmock_main)
 
-  set_target_properties(tracer-test PROPERTIES C_COMPILER_LAUNCHER "${ccache_EXECUTABLE}"
-    CXX_COMPILER_LAUNCHER "${ccache_EXECUTABLE}")
+  if(NOT TRACER_DISABLE_CCACHE AND ccache_FOUND)
+    set_target_properties(tracer-test PROPERTIES C_COMPILER_LAUNCHER "${ccache_EXECUTABLE}"
+      CXX_COMPILER_LAUNCHER "${ccache_EXECUTABLE}")
+  endif()
 
   enable_testing()
   add_test(NAME tracer-test WORKING_DIRECTORY "${tracer_BINARY_DIR}" COMMAND tracer::test
