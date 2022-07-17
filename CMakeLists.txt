@@ -66,6 +66,16 @@ endif()
 option(TRACER_ENABLE_CPPCHECK "enables the cppcheck target" ${_cppcheck_default})
 unset(_cppcheck_default)
 
+# >>> TRACER_ENABLE_CLANGTIDY
+set(_clangtidy_default OFF)
+find_package(clang-tools COMPONENTS tidy QUIET)
+find_package(Python COMPONENTS Interpreter QUIET)
+if(clang-tidy_FOUND AND Python_Interpreter_FOUND)
+  set(_clangtidy_default ON)
+endif()
+option(TRACER_ENABLE_CLANGTIDY "enables the clang-tidy target" ${_clangtidy_default})
+unset(_clangtidy_default)
+
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Dependencies                                                                                                         #
@@ -189,12 +199,7 @@ endif()
 # -------------------------------------------------------------------------------------------------------------------- #
 if(TRACER_ENABLE_CPPCHECK)
   find_package(cppcheck REQUIRED)
-  if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
-    message(FATAL_ERROR "cppcheck requires compile_commands.json which requires CMAKE_EXPORT_COMPILE_COMMANDS=ON.")
-  endif()
-  if(NOT CMAKE_GENERATOR STREQUAL "Unix Makefiles" AND NOT CMAKE_GENERATOR STREQUAL "Ninja")
-    message(FATAL_ERROR "cppcheck requires compile_commands.json which requires 'Unix Makefiles' or 'Ninja' generator.")
-  endif()
+  require_compile_commands()
 
   set(cppcheck_config "${tracer_SOURCE_DIR}/.cppcheck")
   set(cppcheck_bindir "${tracer_BINARY_DIR}/cppcheck")
@@ -238,5 +243,32 @@ if(TRACER_ENABLE_CPPCHECK)
 
     WORKING_DIRECTORY
       "${tracer_BINARY_DIR}"
+  )
+endif()
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# clang-tidy                                                                                                           #
+# -------------------------------------------------------------------------------------------------------------------- #
+if(TRACER_ENABLE_CLANGTIDY)
+  find_package(clang-tools REQUIRED COMPONENTS tidy)
+  find_package(Python COMPONENTS Interpreter REQUIRED)
+  require_compile_commands()
+
+  set(clang_tidy_cfg "${tracer_SOURCE_DIR}/.clang-tidy")
+  set(clang_tidy_script "${tracer_SOURCE_DIR}/cmake/clang-tidy.py")
+
+  add_custom_target(
+    tracer-clangtidy
+
+    COMMAND ${Python_EXECUTABLE} "${clang_tidy_script}"
+      -clang-tidy-binary="${clang-tidy_EXECUTABLE}"
+      -p="${tracer_BINARY_DIR}" -quiet
+      $<$<BOOL:${TRACER_ENABLE_WERROR}>:--warnings-as-errors=*>
+
+    SOURCES
+      "${clang_tidy_cfg}"
+
+    WORKING_DIRECTORY
+      ${tracer_SOURCE_DIR}
   )
 endif()
